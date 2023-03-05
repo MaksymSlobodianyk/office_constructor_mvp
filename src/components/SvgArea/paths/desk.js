@@ -1,20 +1,11 @@
-import { arcDegree } from '../../config';
+import { arcDegree, sizesConfig } from '../../config';
 import * as d3 from "d3";
 
-
-const config = {
-    deskWidth: 60,
-    deskHeight: 36,
-    seatWidth: 24,
-    seatHeight: 16,
-    crossSide: 13
-}
-
-export const getDeskPath = (posX, posY, scale = 1, radius = 4) => {
-    const width = config.deskWidth * scale
-    const height = config.deskHeight * scale
-    let x = posX
-    let y = posY+config.seatHeight
+export const getDeskPath = (scale = 1, radius = 4) => {
+    const width = sizesConfig.deskWidth * scale
+    const height = sizesConfig.deskHeight * scale
+    let x = 0
+    let y = sizesConfig.seatHeight
     let deskPath = d3.path();
     x += radius
     y += radius
@@ -40,12 +31,12 @@ export const getDeskPath = (posX, posY, scale = 1, radius = 4) => {
     return deskPath
 }
 
-export const getSeatPath = (posX, posY, scale = 1, radius = 4) => {
-    const dWidth = config.deskWidth * scale
-    const sWidth = config.seatWidth * scale
-    const sHeight = config.seatHeight * scale
-    let x = posX + dWidth / 2 - sWidth / 2
-    let y = posY+config.seatHeight
+export const getSeatPath = (scale = 1, radius = 4) => {
+    const dWidth = sizesConfig.deskWidth * scale
+    const sWidth = sizesConfig.seatWidth * scale
+    const sHeight = sizesConfig.seatHeight * scale
+    let x = dWidth / 2 - sWidth / 2
+    let y = sizesConfig.seatHeight
 
 
     const seatPath = d3.path();
@@ -68,15 +59,17 @@ export const getSeatPath = (posX, posY, scale = 1, radius = 4) => {
 }
 
 export const getCrossPath = (posX, posY, scale) => {
-   let x = posX + 10 * scale
-   let y = posY + config.deskHeight / 2 - config.crossSide / 2+config.seatHeight
+    console.log(`Desk coord: x:${posX} y:${posY}`)
+    let x = posX + 10 * scale
+    let y = posY + sizesConfig.deskHeight / 2 - sizesConfig.crossSide / 2+sizesConfig.seatHeight
+    console.log(`Cross coord: x:${x} y:${y}`)
 
     const crossPath = d3.path();
     crossPath.moveTo(x, y);
-    x += config.crossSide
-    crossPath.lineTo(x, y + config.crossSide);
+    x += sizesConfig.crossSide
+    crossPath.lineTo(x, y + sizesConfig.crossSide);
     crossPath.moveTo(x, y);
-    crossPath.lineTo(x - config.crossSide, y + config.crossSide);
+    crossPath.lineTo(x - sizesConfig.crossSide, y + sizesConfig.crossSide);
 
     return crossPath
 }

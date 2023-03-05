@@ -1,43 +1,41 @@
 import React, { useEffect } from 'react';
-import { Plan } from '../Plan/Plan';
 import * as d3 from "d3";
 import { getCrossPath, getDeskPath, getSeatPath } from './paths/desk';
-import { statusColor, deskStatus } from '../config';
+import { statusColor, deskStatus, sizesConfig } from '../config';
 const scale = 1
 
-const svgViewportWidth = 1976;
-const svgViewportHeight = 3654;
-
-const SvgArea = ({ desks, setSelectedDesk, onDrag, containerHeight, containerWidth }) => {
+const SvgArea = ({ desks, setSelectedDeskId, onDrag, containerHeight, containerWidth, moveTo }) => {
   const svgRef = React.useRef(null);
   const planRef = React.useRef(null);
   useEffect(() => {
-    // d3.select(svgRef.current)
-    //   .append("svg:image")
-    //   .attr('x', 0)
-    //   .attr('y', 0)
-    //   .attr('width', 1976)
-    //   .attr('height', 3654)
-    //   .attr("xlink:href", "office_plan.svg")
-    //   .on('click', function (data, index) {
-    //     setSelectedDesk(null)// => Original DOM Event
-    //   });
+    d3.select(planRef.current)
+    .append("svg:image")
+    .attr('x', 0)
+    .attr('y', 0)
+    .attr('width', 1976)
+    .attr('height', 3654)
+    .attr("xlink:href", "office_plan.svg")
+  }, [])
 
+  useEffect(() => {
     d3.select(planRef.current)
       .selectAll("g")
       .data(desks)
       .join(
         enter => {
           enter.append("g")
+            .attr("id", "d")
             .each(function (d, i) {
               const group = d3.select(this)
               group.append('path')
                 .attr("id", "desk")
-                .attr("d", d => getDeskPath(d.x, d.y, 1, 4))
+                .attr("d", d => getDeskPath(1, 4))
                 .style("fill", d => statusColor[d.status].desk)
+                .attr('transform', d => 'translate(' + d.x + ',' + d.y + ')')
               group.append('path')
                 .attr("id", "seat")
-                .attr("d", d => getSeatPath(d.x, d.y, 1, 4))
+                .attr("d", d => getSeatPath(1, 4))
+                .attr('transform', d => 'translate(' + d.x + ',' + d.y + ')')
                 .style("fill", d => {
                   return statusColor[d.status].seat
                 })
@@ -54,13 +52,22 @@ const SvgArea = ({ desks, setSelectedDesk, onDrag, containerHeight, containerWid
                 .attr("y", function (d) {
                   return d.y + (36) / 2 + this.getBBox().height / 2 + 14;
                 })
+
+              group.append('path')
+                .attr("id", "cross")
+                .attr("d", d => getCrossPath(d.x, d.y, 1))
+                .style("stroke-width", `${2 * scale}px`)
+                .style("fill", 'none')
+                .filter(d => d.status === deskStatus.BOOKED)
+                .style("stroke", d => statusColor[d.status].seat)
+
               return group
             })
             .each(function (d, i) {
               const group = d3.select(this)
-              group.on('click', (event, data) => setSelectedDesk(data.id))
               group.call(
                 d3.drag()
+                  .on('start', (event, data) => { setSelectedDeskId(data.id) })
                   .on('drag', function dragged(event, d) {
                     this.x = this.x || 0;
                     this.y = this.y || 0;
@@ -69,21 +76,32 @@ const SvgArea = ({ desks, setSelectedDesk, onDrag, containerHeight, containerWid
                     d3.select(this).attr('transform', 'translate(' + this.x + ',' + this.y + ')')
                   })
                   .on('end', function dragged(event, d) {
-                    onDrag(event.x, event.y)
+                    onDrag(d.id, Math.round(event.x), Math.round(event.y))
                   })
               )
 
               return group
             })
-            .filter(d => d.status === deskStatus.BOOKED)
-            .append('path')
-            .attr("id", "cross")
-            .attr("d", d => getCrossPath(d.x, d.y, 1))
-            .style("stroke", d => statusColor[d.status].seat)
-            .style("stroke-width", `${2 * scale}px`)
-            .style("fill", 'none')
         },
         update => {
+          update
+            .call(
+              d3.drag()
+                .on('start', (event, data) => { setSelectedDeskId(data.id) })
+                .on('drag', function dragged(event, d) {
+                  this.x = this.x || 0;
+                  this.y = this.y || 0;
+                  this.x += event.dx;
+                  this.y += event.dy;
+                  d3.select(this).attr('transform', `translate(${this.x },${this.y})`)
+                })
+                .on('end', function dragged(event, d) {
+                  onDrag(d.id, Math.round(event.x), Math.round(event.y))
+                })
+            )
+
+          //update.attr('transform', d => `rotate(${d.rotation},${d.x + sizesConfig.deskWidth/2},${d.y + (sizesConfig.deskWidth + sizesConfig.seatHeight)/2})`)
+
           update.select("#desk").style("fill", d => {
             return statusColor[d.status].desk
           })
@@ -95,18 +113,14 @@ const SvgArea = ({ desks, setSelectedDesk, onDrag, containerHeight, containerWid
           update.select("#name").style("fill", d => {
             return statusColor[d.status].text
           })
-          
+
           update.filter(d => d.status === deskStatus.BOOKED)
-          .append('path')
-          .attr("id", "cross")
-          .attr("d", d => getCrossPath(d.x, d.y, 1))
-          .style("stroke", d => statusColor[d.status].seat)
-          .style("stroke-width", `${2 * scale}px`)
-          .style("fill", 'none')
+            .select('#cross')
+            .style("stroke", d => statusColor[d.status].seat)
 
           update.filter(d => d.status !== deskStatus.BOOKED)
-          .select("#cross")
-          .remove()
+            .select('#cross')
+            .style("stroke", 'none')
         },
         exit => exit.remove()
 
@@ -122,7 +136,8 @@ const SvgArea = ({ desks, setSelectedDesk, onDrag, containerHeight, containerWid
     }
 
     const zoom = d3.zoom()
-      .scaleExtent([0, 3])
+      .scaleExtent([0.3, 1])
+      .translateExtent([[100,0], [1880,3650]])
       .on('zoom', handleZoom);
 
     d3.select(svgRef.current)
@@ -130,15 +145,24 @@ const SvgArea = ({ desks, setSelectedDesk, onDrag, containerHeight, containerWid
 
   }, [desks])
 
+  // useEffect(() => {
+  //   console.log(moveTo)
+  //   if(moveTo){
+  //     d3.select(planRef.current).transition()
+  //     .duration(1000)
+  //     .attr("transform", moveTo);
+  //   }
+  // }, [moveTo])
+
+  
   return (
     <svg ref={svgRef}
       width={containerWidth}
       height={containerHeight}
-      viewBox={[0, 0, 500, 500].join(' ')}
+      viewBox={[100, 100, 500, 500].join(' ')}
+      style={{border: '1px solid red'}}
     >
-      <g ref={planRef}
-        dangerouslySetInnerHTML={{ __html: Plan }}
-      />
+      <g ref={planRef}      />
     </svg>
   );
 }

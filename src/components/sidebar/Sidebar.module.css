@@ -1,21 +1,23 @@
-.sidebar{
-    height: 100%;
+.sidebar {
+    height: calc(100% - 80px);
     width: 25%;
-    border-right: 2px solid;
-    border-color: blueviolet;
-    padding-top: 40px;
+    padding: 20px;
+    margin-right: 20px;
 }
 
-.spacer{
-    height: 50px;
+.spacer {
+    height: 20px;
 }
 
-.deskListItem{
+.list{
+    max-height: 100%;
+    overflow: auto;
+}
+
+.deskListItem {
     border: 2px solid;
     border-radius: 8px;
-    border-color: blueviolet;
-    padding-top: 40px;
-    margin: 20px 20px 0 20px;
-    padding: 5px;
+    margin-top: 20px;
+    padding: 15px;
     text-align: start;
 }

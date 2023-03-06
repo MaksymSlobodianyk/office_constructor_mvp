@@ -9,7 +9,7 @@
     height: 20px;
 }
 
-.list{
+.list {
     max-height: 100%;
     overflow: auto;
 }

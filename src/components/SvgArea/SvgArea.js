@@ -17,7 +17,7 @@ const SvgArea = ({ desks, setSelectedDeskId, onDrag, containerHeight, containerW
       .attr("xlink:href", "office_plan.svg")
   }, [])
 
-  useEffect(() => {
+  useEffect(() => {ßß
     d3.select(planRef.current)
       .selectAll("g")
       .data(desks)
@@ -52,7 +52,7 @@ const SvgArea = ({ desks, setSelectedDeskId, onDrag, containerHeight, containerW
                   return d.x + sizesConfig.deskWidth * scale - this.getBBox().width - 3 * scale;
                 })
                 .attr("y", function (d) {
-                  return d.y + sizesConfig.seatHeight * scale + sizesConfig.deskHeight * scale / 2 + this.getBBox().height /4;
+                  return d.y + sizesConfig.seatHeight * scale + sizesConfig.deskHeight * scale / 2 + this.getBBox().height / 4;
                 })
 
               group.append('path')
@@ -148,7 +148,6 @@ const SvgArea = ({ desks, setSelectedDeskId, onDrag, containerHeight, containerW
   }, [desks])
 
   // useEffect(() => {
-  //   console.log(moveTo)
   //   if(moveTo){
   //     d3.select(planRef.current).transition()
   //     .duration(1000)

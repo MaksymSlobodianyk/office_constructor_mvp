@@ -59,17 +59,15 @@ export const getSeatPath = (scale = 1, radius = 4) => {
 }
 
 export const getCrossPath = (posX, posY, scale) => {
-    console.log(`Desk coord: x:${posX} y:${posY}`)
     let x = posX + 10 * scale
-    let y = posY + sizesConfig.deskHeight*scale / 2 - sizesConfig.crossSide*scale / 2+sizesConfig.seatHeight
-    console.log(`Cross coord: x:${x} y:${y}`)
+    let y = posY + sizesConfig.deskHeight * scale / 2 - sizesConfig.crossSide * scale / 2 + sizesConfig.seatHeight
 
     const crossPath = d3.path();
     crossPath.moveTo(x, y);
-    x += sizesConfig.crossSide*scale
-    crossPath.lineTo(x, y + sizesConfig.crossSide*scale);
+    x += sizesConfig.crossSide * scale
+    crossPath.lineTo(x, y + sizesConfig.crossSide * scale);
     crossPath.moveTo(x, y);
-    crossPath.lineTo(x - sizesConfig.crossSide*scale, y + sizesConfig.crossSide*scale);
+    crossPath.lineTo(x - sizesConfig.crossSide * scale, y + sizesConfig.crossSide * scale);
 
     return crossPath
 }

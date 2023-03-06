@@ -53,20 +53,20 @@ function App() {
     <div className={styles.appContainer}>
       <Sidebar onAddDesk={onAddDesk} desks={desks} trigger={moveTo} />
       <div className={styles.editContainer}>
-        <Topbar onAddDesk={onAddDesk} selectedDesk={desks.find(desk => desk.id === selectedDeskId)} onStatusChange={onStatusChange} onRotationChange={onRotationChange}/>
+        <Topbar onAddDesk={onAddDesk} selectedDesk={desks.find(desk => desk.id === selectedDeskId)} onStatusChange={onStatusChange} onRotationChange={onRotationChange} />
         <SvgArea containerHeight={600} containerWidth={600} desks={desks} setSelectedDeskId={setSelectedDeskId} onDrag={onDrag} moveTo={moveToCoords}></SvgArea>
       </div>
       <div style={{ maxWidth: "700px", maxHeight: "100%" }}>
-          <JSONInput
-            placeholder={{ desks, selectedDeskId }} // data to display
-            theme="light_mitsuketa_tribute"
-            locale={locale}
-            colors={{
-              string: "#DAA520" // overrides theme colors with whatever color value you want
-            }}
-            height="100%"
-          />
-        </div>
+        <JSONInput
+          placeholder={{ desks, selectedDeskId }} // data to display
+          theme="light_mitsuketa_tribute"
+          locale={locale}
+          colors={{
+            string: "#DAA520" // overrides theme colors with whatever color value you want
+          }}
+          height="100%"
+        />
+      </div>
     </div>
   );
 }

@@ -17,7 +17,7 @@ const SvgArea = ({ desks, setSelectedDeskId, onDrag, containerHeight, containerW
       .attr("xlink:href", "office_plan.svg")
   }, [])
 
-  useEffect(() => {ßß
+  useEffect(() => {
     d3.select(planRef.current)
       .selectAll("g")
       .data(desks)

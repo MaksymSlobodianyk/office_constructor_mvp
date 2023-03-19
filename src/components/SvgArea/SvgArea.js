@@ -102,7 +102,7 @@ const SvgArea = ({ desks, setSelectedDeskId, onDrag, containerHeight, containerW
                 })
             )
 
-          //update.attr('transform', d => `rotate(${d.rotation},${d.x + sizesConfig.deskWidth/2},${d.y + (sizesConfig.deskWidth + sizesConfig.seatHeight)/2})`)
+          update.attr('transform', d => `rotate(${d.rotation},${d.x + sizesConfig.deskWidth/2},${d.y + (sizesConfig.deskHeight + sizesConfig.seatHeight)/2})`)
 
           update.select("#desk").style("fill", d => {
             return statusColor[d.status].desk

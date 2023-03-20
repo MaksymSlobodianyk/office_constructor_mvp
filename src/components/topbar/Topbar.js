@@ -9,12 +9,12 @@ const Topbar = ({ onRotationChange, onStatusChange, selectedDesk }) => {
         <option value={deskStatus.PERMANENTLY_BOOKED}>Permanently booked</option>
       </select>
       <div className={styles.spacer}></div>
-      {/* <select onChange={(e) => {onRotationChange(e.target.value) }} defaultValue={'none'} value={selectedDesk?.rotation} disabled={!selectedDesk}>
+      <select onChange={(e) => {onRotationChange(e.target.value) }} defaultValue={'none'} value={selectedDesk?.rotation} disabled={!selectedDesk}>
         <option value={deskRotation.D0}>0°</option>
         <option value={deskRotation.D90}>90°</option>
         <option value={deskRotation.D180}>180°</option>
         <option value={deskRotation.D270}>270°</option>
-      </select> */}
+      </select>
     </div>
   );
 }

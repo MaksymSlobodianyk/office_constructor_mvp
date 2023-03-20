@@ -18,6 +18,20 @@ const SvgArea = ({ desks, setSelectedDeskId, onDrag, containerHeight, containerW
   }, [])
 
   useEffect(() => {
+
+    const dragHandler = d3.drag()
+      .on('start', (event, data) => {
+        setSelectedDeskId(data.id) })
+      .on('drag', function dragged(event, d) {
+        this.x = this.x || d.x;
+        this.y = this.y || d.y;
+        this.x += event.dx;
+        this.y += event.dy;
+        onDrag(d.id, Math.round(this.x), Math.round(this.y))
+      })
+      .on('end', function dragged(event, d) {
+        onDrag(d.id, Math.round(event.x), Math.round(event.y))
+      })
     d3.select(planRef.current)
       .selectAll("g")
       .data(desks)
@@ -31,15 +45,12 @@ const SvgArea = ({ desks, setSelectedDeskId, onDrag, containerHeight, containerW
                 .attr("id", "desk")
                 .attr("d", d => getDeskPath(scale, 4))
                 .style("fill", d => statusColor[d.status].desk)
-                .attr('transform', d => 'translate(' + d.x + ',' + d.y + ')')
               group.append('path')
                 .attr("id", "seat")
                 .attr("d", d => getSeatPath(scale, 4))
-                .attr('transform', d => 'translate(' + d.x + ',' + d.y + ')')
                 .style("fill", d => {
                   return statusColor[d.status].seat
                 })
-
               group.append('text')
                 .attr("id", "name")
                 .text(d => d.name)
@@ -48,61 +59,37 @@ const SvgArea = ({ desks, setSelectedDeskId, onDrag, containerHeight, containerW
                 .style("font", `${17 * scale}px sans-serif`)
                 .style("fill", d => statusColor[d.status].text)
                 .style("display", "block")
-                .attr("x", function (d) {
-                  return d.x + sizesConfig.deskWidth * scale - this.getBBox().width - 3 * scale;
+                .attr("x", function () {
+                  return sizesConfig.deskWidth * scale - this.getBBox().width - 3 * scale;
                 })
-                .attr("y", function (d) {
-                  return d.y + sizesConfig.seatHeight * scale + sizesConfig.deskHeight * scale / 2 + this.getBBox().height / 4;
+                .attr("y", function () {
+                  return sizesConfig.seatHeight * scale + sizesConfig.deskHeight * scale / 2 + this.getBBox().height / 4;
                 })
-
               group.append('path')
                 .attr("id", "cross")
-                .attr("d", d => getCrossPath(d.x, d.y, scale))
+                .attr("d", d => getCrossPath(0, 0, scale))
                 .style("stroke-width", `${2 * scale}px`)
                 .style("fill", 'none')
                 .filter(d => d.status === deskStatus.BOOKED)
                 .style("stroke", d => statusColor[d.status].seat)
 
+              group.attr('transform', d => `rotate(${d.rotation},${d.x + sizesConfig.deskWidth / 2},${d.y + (sizesConfig.deskHeight + sizesConfig.seatHeight) / 2})translate(${d.x},${d.y})`)
               return group
             })
             .each(function (d, i) {
               const group = d3.select(this)
               group.call(
-                d3.drag()
-                  .on('start', (event, data) => { setSelectedDeskId(data.id) })
-                  .on('drag', function dragged(event) {
-                    this.x = this.x || 0;
-                    this.y = this.y || 0;
-                    this.x += event.dx;
-                    this.y += event.dy;
-                    d3.select(this).attr('transform', 'translate(' + this.x + ',' + this.y + ')')
-                  })
-                  .on('end', function dragged(event, d) {
-                    onDrag(d.id, Math.round(event.x), Math.round(event.y))
-                  })
+                dragHandler
               )
 
               return group
             })
         },
         update => {
-          update
-            .call(
-              d3.drag()
-                .on('start', (event, data) => { setSelectedDeskId(data.id) })
-                .on('drag', function dragged(event, d) {
-                  this.x = this.x || 0;
-                  this.y = this.y || 0;
-                  this.x += event.dx;
-                  this.y += event.dy;
-                  d3.select(this).attr('transform', `translate(${this.x},${this.y})`)
-                })
-                .on('end', function dragged(event, d) {
-                  onDrag(d.id, Math.round(event.x), Math.round(event.y))
-                })
-            )
+          update.call(dragHandler)
 
-          update.attr('transform', d => `rotate(${d.rotation},${d.x + sizesConfig.deskWidth/2},${d.y + (sizesConfig.deskHeight + sizesConfig.seatHeight)/2})`)
+          update.attr('transform', d => `rotate(${d.rotation},${d.x + sizesConfig.deskWidth / 2},${d.y + (sizesConfig.deskHeight + sizesConfig.seatHeight) / 2})translate(${d.x},${d.y})`)
+          
 
           update.select("#desk").style("fill", d => {
             return statusColor[d.status].desk
@@ -164,6 +151,16 @@ const SvgArea = ({ desks, setSelectedDeskId, onDrag, containerHeight, containerW
       style={{ border: '1px solid red' }}
     >
       <g ref={planRef} />
+      {/* <Desk desk={{
+      id: 'bd03f5c3-7683-4b8e-b88d-7e249175b5c7',
+      name: 123,
+      x: 200,
+      y: 200,
+      status: deskStatus.BOOKED,
+      rotation: 0
+    }}
+    setSelectedDeskId={setSelectedDeskId}
+    /> */}
     </svg>
   );
 }
